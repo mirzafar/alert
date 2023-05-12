@@ -1,0 +1,163 @@
+{% extends 'admin/base.html' %}
+{% block header %}
+<div class="col-6">
+    <h3>Заявки</h3>
+</div>
+<div class="col-6">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"> <i data-feather="home"></i></a></li>
+        <li class="breadcrumb-item active">Заявки</li>
+    </ol>
+</div>
+{% endblock %}
+{% block container %}
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="col-sm-12">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="table-responsive">
+
+                            <table class="display dataTable" id="basic-9" role="grid" aria-describedby="basic-9_info">
+                                <thead>
+                                <tr role="row">
+                                    <th>Имя</th>
+                                    <th>Email</th>
+                                    <th>Телефон номер</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for dt in data %}
+                                <tr role="row" class="js-cont" data-id="{{ dt._id }}">
+                                    <td>
+                                        <span>{{dt.name}}</span>
+                                        <input style="display: none" type="text" class="form-control" name="name"
+                                               value="{{ dt.name }}">
+                                    </td>
+
+                                    <td>
+                                        <span>{{ dt.email }}</span>
+                                        <input style="display: none" type="text" class="form-control" name="email"
+                                               value="{{ dt.email }}">
+                                    </td>
+                                    <td>
+                                        <span>{{ dt.phone_number }}</span>
+                                        <input style="display: none" type="text" class="form-control"
+                                               name="phone_number"
+                                               value="{{ dt.phone_number }}">
+                                    </td>
+                                    <td>
+                                        {% if dt.state == 1 %}
+                                        <span class="badge rounded-pill badge-success">active</span>
+                                        {% else %}
+                                        <span class="badge rounded-pill badge-warning">Not active</span>
+                                        {% endif %}
+                                        <select style="display: none" class="form-control" name="state">
+                                            <option {% if dt.state== 1 %} selected {% endif %} value="1">Active</option>
+                                            <option {% if dt.state== 0 %} selected {% endif %} value="0">Not active
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-pill btn-warning btn-air-warning btn-air-warning js-change"
+                                           href="#"><i
+                                                class="bx bx-edit-alt me-1"></i>Edit</a>
+                                        <a style="display: none"
+                                           class="btn btn-sm btn-pill btn-success btn-air-success btn-air-success js-update"
+                                           href="#"><i
+                                                class="bx bx-menu"></i>Save</a>
+                                        <a style="display: none"
+                                           class="btn btn-sm btn-pill btn-primary btn-air-primary js-cancel"
+                                           href="#"><i
+                                                class="bx bx-menu"></i>Cancel</a>
+                                        <a class="btn btn-sm btn-pill btn-danger btn-air-danger js-remove" href="#"><i
+                                                class="bx bx-trash me-1"></i>Delete</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $('.js-update').click(function () {
+        var new_id = $(this).parents('tr').data('id');
+        var new_data = getValues('.js-cont[data-id="' + new_id + '"]')
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: '/collection/applications/' + new_id,
+            data: JSON.stringify(new_data),
+            success: function (d) {
+                if (d['_success'] == true) {
+                    alert("good")
+                    location.reload()
+                } else {
+                    alert(d['message'])
+                }
+            },
+            error: function (d) {
+                alert("errors!")
+            }
+        });
+        return false;
+    });
+    $('.js-remove').click(function () {
+        var new_id = $(this).parents('tr').data('id');
+        var new_data = getValues('.js-cont[data-id="' + new_id + '"]')
+        new_data.status = -1
+        console.log(new_data)
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: '/collection/applications/' + new_id,
+            data: JSON.stringify(new_data),
+            success: function (d) {
+                if (d['_success'] == true) {
+                    alert("good")
+                    location.reload()
+                } else {
+                    alert(d['message'])
+                }
+            },
+            error: function (d) {
+                alert("errors!")
+            }
+        });
+        return false;
+    });
+    $('.js-change').click(function () {
+        $(this).hide();
+        $(this).parents('tr').find('span').hide();
+        $(this).parents('tr').find('input').show();
+        $(this).parents('tr').find('select').show();
+        $(this).parents('tr').find('.js-update').show();
+        $(this).parents('tr').find('.js-cancel').show();
+        $(this).parents('tr').find('.js-remove').hide();
+        return false;
+    });
+    $('.js-cancel').click(function () {
+        $(this).hide();
+        $(this).parents('tr').find('span').show();
+        $(this).parents('tr').find('input').hide();
+        $(this).parents('tr').find('select').hide();
+        $(this).parents('tr').find('.js-update').hide();
+        $(this).parents('tr').find('.js-remove').show();
+        $(this).parents('tr').find('.js-change').show();
+        return false;
+    })
+</script>
+{% endblock %}

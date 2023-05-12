@@ -1,0 +1,88 @@
+
+/* 16. faq page css here */
+
+.faq_content_area {
+	padding-bottom: 56px;
+    @media #{$large-mobile}{
+        margin-top: 26px;
+    }
+}
+.accordion_area {
+	padding-bottom: 60px;
+}
+
+.accordion-item {
+	border: none;
+    margin-bottom: 10px;
+    & .accordion-collapse{
+        border: 0;
+    }
+}
+.accordion-item:last-child {
+	margin-bottom: 0;
+}
+
+
+.accordion-header  {
+    padding: 0;
+	border: none;
+    & button{
+        height: 45px;
+        text-decoration: none;
+        cursor: pointer;
+        position: relative;
+        white-space: initial;
+        @media #{$large-mobile}{
+            height: 60px;
+        }
+        &:focus{
+            box-shadow: none;
+        }
+        & i{
+            position: absolute;
+            top: 50%;
+            -webkit-transform: translatey(-50%);
+            transform: translatey(-50%);
+            right: 20px;
+            @media #{$large-mobile}{
+                right: 10px;
+            }
+        }
+        &.accordion-button{
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: $fonts_color;
+            background: #ededed;
+            border: 1px solid #ededed;
+            &.collapsed{
+                width: 100%;
+                text-align: left;
+                color: $fonts_color;
+                @media #{$large-mobile}{
+                    padding-right: 28px;
+                }
+            }
+        }
+    }
+}
+
+.faq_content_wrapper{
+    & h4{
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        line-height: 18px;
+        @media #{$large-mobile}{
+            font-size: 14px;
+            line-height: 24px;
+        }
+    }
+}
+
+/*faq page css end*/
+
+
+
+

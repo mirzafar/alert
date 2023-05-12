@@ -1,0 +1,14 @@
+.DS_Store
+.idea/
+Pipfile
+Pipfile.lock
+server/__pycache__/
+server/admin/__pycache__/
+server/admin/api/__pycache__/
+server/api/__pycache__/
+*.pyc
+static/uploads/
+local_settings.py
+
+*.txt
+
