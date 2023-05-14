@@ -23,6 +23,10 @@ class OrdersView(BaseAPIView):
             data.append(rc)
 
         context['data'] = data
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
     async def post(self, request, user):

@@ -1,5 +1,7 @@
 import re
 
+from bson import ObjectId
+
 from core.db import mongo
 from core.handlers import BaseAPIView
 
@@ -13,5 +15,8 @@ class UsersCreateView(BaseAPIView):
         context = dict()
 
         context['roles'] = await mongo.roles.find({'status': 0}).to_list(length=None)
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
 
         return self.render_template(request=request, **context)

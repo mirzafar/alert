@@ -1,3 +1,5 @@
+from bson import ObjectId
+
 from core.db import mongo
 from core.handlers import BaseAPIView
 
@@ -10,4 +12,10 @@ class RolesView(BaseAPIView):
             'status': 0
         }
         data = await mongo.roles.find(filter_obj).sort('created_at', -1).to_list(length=None)
-        return self.render_template(request=request, data=data)
+        user = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
+        return self.render_template(
+            request=request,
+            data=data,
+            user=user
+        )

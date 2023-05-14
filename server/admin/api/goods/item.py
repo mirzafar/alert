@@ -30,6 +30,10 @@ class GoodItemView(BaseAPIView):
             data['price'] = math.ceil(float(data['price']) * 100 / (100 - float(data['discount'])) * 100) / 100
 
         context['data'] = data
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
     async def post(self, request, user, good_id):

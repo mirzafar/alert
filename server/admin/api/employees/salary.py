@@ -15,6 +15,9 @@ class SalaryView(BaseAPIView):
     async def get(self, request, user):
         context = dict()
 
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         # current_user
         current_user = await mongo.users.find_one({'_id': ObjectId(user.id)})
         context['current_user'] = current_user

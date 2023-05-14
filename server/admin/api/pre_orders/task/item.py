@@ -4,7 +4,7 @@ from bson import ObjectId
 from sanic import response
 
 from core.db import mongo
-from core.handlers import TemplateHTTPView
+from core.handlers import BaseAPIView
 from utils.ints import IntUtils
 from utils.lists import ListUtils
 from utils.strs import StrUtils
@@ -20,11 +20,12 @@ PRIORITY = {
 }
 
 
-class PreOrdersTasksItemView(TemplateHTTPView):
+class PreOrdersTasksItemView(BaseAPIView):
     template_name = 'admin/pre_orders_task_item.html'
 
-    async def get(self, request, item_id):
+    async def get(self, request, user, item_id):
         context = dict()
+
         filter_obj = {
             '_id': ObjectId(item_id)
         }
@@ -45,12 +46,15 @@ class PreOrdersTasksItemView(TemplateHTTPView):
 
         context['priority'] = PRIORITY
         context['data'] = data
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
-    async def post(self, request, item_id):
+    async def post(self, request, user, item_id):
         action = request.json.get("action")
-        print(request.json)
-        print()
+
         if action == 'edit':
             title = StrUtils.to_str(request.json.get('title'))
             pre_order_id = StrUtils.to_str(request.json.get('pre_order_id'))

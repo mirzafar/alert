@@ -27,6 +27,9 @@ class UsersItemView(BaseAPIView):
         context['data'] = await mongo.users.find_one(filter_obj)
         context['roles'] = await mongo.roles.find({'status': 0}).to_list(length=None)
 
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
     async def post(self, request, user, user_id):
@@ -89,7 +92,7 @@ class UsersItemView(BaseAPIView):
 
                 set_update['email'] = email
 
-            if password:
+            if password and reply_password:
                 if password == reply_password:
                     passwd_hash = md5()
                     passwd_hash.update(password.encode())
@@ -109,8 +112,10 @@ class UsersItemView(BaseAPIView):
                 set_update['role_id'] = role_id
 
             if phone_number:
-                if (phone_number.startswith('87') and len(phone_number) == 11) or (
-                        phone_number.startswith('+7') and len(phone_number) == 12):
+                if any([
+                    (phone_number.startswith('87') and len(phone_number) == 11),
+                    (phone_number.startswith('+7') and len(phone_number) == 12)
+                ]):
                     set_update['phone_number'] = phone_number
                 else:
                     return response.json({

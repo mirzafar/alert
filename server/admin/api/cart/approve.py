@@ -1,5 +1,7 @@
 import math
 
+from bson import ObjectId
+
 from core.db import mongo
 from core.handlers import BaseAPIView
 from utils.ints import IntUtils
@@ -29,5 +31,8 @@ class ApproveView(BaseAPIView):
 
         info = await mongo.info.find_one({})
         context['info'] = info if info else {}
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
 
         return self.render_template(request=request, **context)

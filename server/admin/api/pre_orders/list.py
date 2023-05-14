@@ -4,15 +4,15 @@ from bson import ObjectId
 from sanic import response
 
 from core.db import mongo
-from core.handlers import TemplateHTTPView
+from core.handlers import BaseAPIView
 from utils.ints import IntUtils
 from utils.strs import StrUtils
 
 
-class PreOrdersView(TemplateHTTPView):
+class PreOrdersView(BaseAPIView):
     template_name = 'admin/pre_orders.html'
 
-    async def get(self, request):
+    async def get(self, request, user):
         context = dict()
         status = IntUtils.to_int(request.args.get('status')) or 0
 
@@ -30,9 +30,12 @@ class PreOrdersView(TemplateHTTPView):
         context['data'] = data
         context['status'] = status
 
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
-    async def post(self, request):
+    async def post(self, request, user):
         last_name = StrUtils.to_str(request.json.get('last_name'))
         first_name = StrUtils.to_str(request.json.get('first_name'))
         title = StrUtils.to_str(request.json.get('title'))
@@ -55,7 +58,7 @@ class PreOrdersView(TemplateHTTPView):
             })
 
         if (phone_number.startswith('87') and len(phone_number) == 11) or (
-                phone_number.startswith('+7') and len(phone_number) == 12):
+            phone_number.startswith('+7') and len(phone_number) == 12):
             pass
         else:
             return response.json({

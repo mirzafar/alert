@@ -2,6 +2,8 @@ import calendar
 import math
 from datetime import datetime
 
+from bson import ObjectId
+
 from core.db import mongo
 from core.handlers import BaseAPIView
 from utils.strs import StrUtils
@@ -97,5 +99,8 @@ class AnalyticsView(BaseAPIView):
         ]).to_list(length=None)
 
         context['rents'] = total[0] if total else {}
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
 
         return self.render_template(request=request, **context)

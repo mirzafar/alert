@@ -13,9 +13,9 @@ password_regex = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$
 
 class UserSerializer:
     def __init__(
-            self,
-            id: str,
-            name: list
+        self,
+        id: str,
+        name: list
     ):
         self.id = id
 
@@ -69,8 +69,6 @@ class LoginAdminView(TemplateHTTPView):
 
         if user:
             auth.login_user(request, user)
-            print(auth.current_user(request))
-            print()
 
             return response.json({
                 '_success': True,

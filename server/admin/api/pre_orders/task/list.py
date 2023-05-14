@@ -5,7 +5,7 @@ from bson import ObjectId
 from sanic import response
 
 from core.db import mongo
-from core.handlers import TemplateHTTPView
+from core.handlers import BaseAPIView
 from utils.ints import IntUtils
 from utils.lists import ListUtils
 from utils.strs import StrUtils
@@ -21,14 +21,14 @@ PRIORITY = {
 }
 
 
-class PreOrdersTasksView(TemplateHTTPView):
+class PreOrdersTasksView(BaseAPIView):
     template_name = 'admin/pre_orders_task_list.html'
 
-    async def get(self, request):
+    async def get(self, request, user):
         limit = IntUtils.to_int(request.args.get('limit')) or 16
         page = IntUtils.to_int(request.args.get('page')) or 1
         status = IntUtils.to_int(request.args.get('status')) or 0
-        employee_id = StrUtils.to_str(request.args.get('employee_id'))
+        employee_id = StrUtils.to_str(request.args.get('employee_id')) or user.id
 
         skip = (page - 1) * limit
 
@@ -60,6 +60,9 @@ class PreOrdersTasksView(TemplateHTTPView):
         context['employee_id'] = employee_id
 
         context['priority'] = PRIORITY
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
 
         return self.render_template(request=request, **context)
 

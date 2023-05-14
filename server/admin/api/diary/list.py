@@ -51,6 +51,9 @@ class DiaryView(BaseAPIView):
         total = await mongo.diary.count_documents(filter_obj)
         context['_range'] = math.ceil(total / limit)
 
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
     async def post(self, request, user):

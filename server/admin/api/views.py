@@ -1,9 +1,7 @@
 from bson import ObjectId
-from sanic import response
 
 from core.db import mongo
-from core.handlers import BaseAPIView, TemplateHTTPView
-from settings import settings
+from core.handlers import BaseAPIView
 
 
 class TariffsView(BaseAPIView):
@@ -24,6 +22,10 @@ class TariffsView(BaseAPIView):
 
         context['roles'] = await mongo.roles.find({'status': 0}).to_list(length=None)
         context['data'] = data
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
 
@@ -41,6 +43,10 @@ class BrandsView(BaseAPIView):
             data.append(brand)
 
         context['data'] = data
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
 
@@ -58,6 +64,10 @@ class SizesView(BaseAPIView):
             data.append(size)
 
         context['data'] = data
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
 
@@ -75,6 +85,10 @@ class ColorsView(BaseAPIView):
             data.append(color)
 
         context['data'] = data
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
 
@@ -103,4 +117,8 @@ class OverheadView(BaseAPIView):
                 data[x['_id']].update(x)
 
         context['data'] = [v for k, v in data.items()]
+
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)

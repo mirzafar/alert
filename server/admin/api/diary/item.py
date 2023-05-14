@@ -10,6 +10,7 @@ class DiaryItemView(BaseAPIView):
     template_name = 'admin/diary-item.html'
 
     async def get(self, request, user, diary_id):
+
         filter_obj = {
             '_id': ObjectId(diary_id)
         }
@@ -23,4 +24,12 @@ class DiaryItemView(BaseAPIView):
         if data and data.get('stop_date'):
             data['stop_date'] = datetime.datetime.strftime(data['stop_date'], '%H:%M')
 
-        return self.render_template(request=request, data=data, users=users)
+        # CURRENT USER
+        user = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
+        return self.render_template(
+            request=request,
+            data=data,
+            users=users,
+            user=user
+        )

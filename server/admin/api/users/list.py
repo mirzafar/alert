@@ -2,6 +2,7 @@ import math
 import re
 from hashlib import md5
 
+from bson import ObjectId
 from sanic import response
 
 from core.db import mongo
@@ -38,20 +39,23 @@ class UsersView(BaseAPIView):
         total = await mongo.users.count_documents(filter_obj)
         context['_range'] = math.ceil(total / limit)
 
+        # CURRENT USER
+        context['user'] = await mongo.users.find_one({'_id': ObjectId(user.id)})
+
         return self.render_template(request=request, **context)
 
     async def post(self, request, user):
         first_name = StrUtils.to_str(request.json.get('first_name'))
         last_name = StrUtils.to_str(request.json.get('last_name'))
-        middle_name = StrUtils.to_str(request.json.get('middle_name'))
-        birthday = StrUtils.to_str(request.json.get('birthday'))
+        middle_name = StrUtils.to_str(request.json.get('middle_name')) or ''
+        birthday = StrUtils.to_str(request.json.get('birthday')) or ''
         username = StrUtils.to_str(request.json.get('username'))
         email = StrUtils.to_str(request.json.get('email'))
-        iin = StrUtils.to_str(request.json.get('iin'))
-        phone_number = StrUtils.to_str(request.json.get('phone_number'))
+        iin = StrUtils.to_str(request.json.get('iin')) or ''
+        phone_number = StrUtils.to_str(request.json.get('phone_number')) or ''
         password = StrUtils.to_str(request.json.get('password'))
         reply_password = StrUtils.to_str(request.json.get('reply_password'))
-        photo = StrUtils.to_str(request.json.get('photo'))
+        photo = StrUtils.to_str(request.json.get('photo')) or ''
         role_id = StrUtils.to_str(request.json.get('role_id'))
         scope = ListUtils.to_list_of_strs(request.json.get('scope'))
 
@@ -89,9 +93,7 @@ class UsersView(BaseAPIView):
                 'message': 'Required param(s): email'
             })
 
-        if scope:
-            pass
-        else:
+        if not scope:
             return response.json({
                 '_success': False,
                 'message': 'Required param(s): scope'
@@ -103,7 +105,7 @@ class UsersView(BaseAPIView):
                 'message': 'Required param(s): role_id'
             })
 
-        if password:
+        if password and reply_password:
             if password == reply_password:
                 passwd_hash = md5()
                 passwd_hash.update(password.encode())
@@ -120,10 +122,8 @@ class UsersView(BaseAPIView):
             })
 
         if phone_number:
-            if (phone_number.startswith('87') and len(phone_number) == 11) or (
-                phone_number.startswith('+7') and len(phone_number) == 12):
-                pass
-            else:
+            if not any([(phone_number.startswith('87') and len(phone_number) == 11),
+                        (phone_number.startswith('+7') and len(phone_number) == 12)]):
                 return response.json({
                     '_success': False,
                     'message': 'Invalid phone number'
